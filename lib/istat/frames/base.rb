@@ -21,23 +21,31 @@ require "rexml/document"
 # THE SOFTWARE.
 module Istat
   module Frames
+    # This class handles basic xml actions and content parsing for the frames
+    # @abstract
     class Base
+      # xml doytype style header
       DOCTYPE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>".freeze
     
       # creates a frame based on the passed xml string
+      # @param [String] xml_str the xml string to use for initalization
       def initialize(xml_str)
         @doc = REXML::Document.new(xml_str)
         @root = @doc.root
       end
     
-      # returns the serialized frame
+      # serialize the frame (as xml)
+      # @return [String] a xml structure
       def to_s
         @doc.to_s
       end
     
     protected
     
-      # create new frame based on the passed params
+      # create new frame (xml) based on the passed params
+      # @params [Array<Array>] the arrays on which the xml structure will be generated
+      # @return [String] the generated xml structure
+      # @api private
       def create(*params)
         xml = "#{DOCTYPE}<isr>"
         params.each { |key, value| xml << "<#{key}>#{value}</#{key}>" }

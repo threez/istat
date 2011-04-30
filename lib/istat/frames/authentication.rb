@@ -20,11 +20,15 @@
 module Istat
   module Frames
     # authenticate with passwd
-    class AuthenticationRequest
+    class AuthenticationRequest 
+      # create a new authentication resquest frame with the passed code/password
+      # @param [String] password the password to use for authentication
       def initialize(password)
         @password = password
       end
       
+      # just returns the password, the frame has no header or container
+      # @return [String] the password
       def to_s
         @password
       end
@@ -34,8 +38,8 @@ module Istat
       READY  = "ready".freeze
       REJECT = "athrej".freeze
 
-      # check for an ready frame
-      
+      # check if he authentication was successful
+      # @return [Boolean] true if authentication is successful
       def ready?
         if val = @root.attributes[READY]
           val.to_i == 1
@@ -44,7 +48,8 @@ module Istat
         end
       end
 
-      # check for an ready frame
+      # check if he authentication was rejected
+      # @return [Boolean] true if authentication is rejected
       def rejected?
         if val = @root.attributes[REJECT]
           val.to_i == 1

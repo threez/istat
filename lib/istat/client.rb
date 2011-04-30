@@ -24,15 +24,31 @@ module Istat
     class WrongPasswordException < Exception; end
     class NoServiceException < Exception; end
     class RegisterException < Exception; end
+    
+    # the frame that was send from the server after registration
     attr_accessor :connection_frame
     
     # create a new istat client instance
+    # @param host [String] the hostname of the remote istat server
+    # @param port [String] the port of the istat server usually 5109
+    # @param passwd [String] the passwd or code to access the server
+    # @param logger [optional Logger] a logger that will log all actions on the client
+    # @example
+    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #
     def initialize(host, port, passwd, logger = nil)
       @host, @port, @passwd, @logger = host, port, passwd, logger
       @request_id = 1
     end
     
-    # starts a session on the remote machine
+    # starts a session on the remote machine and yields it to the passed block.
+    # @yield [Istat::Client] the remote session
+    # @example
+    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #   @client.start do |session|
+    #     # work with the session
+    #   end
+    #
     def start
       connect!
       if online?
@@ -52,6 +68,7 @@ module Istat
     end
     
     # connect to the remote server
+    # @return [Boolean] true is the connection was successfull
     def connect!
       @logger.info "Connect to #{@host}:#{@port}" if @logger
       @socket = TCPSocket.new(@host, @port)
@@ -59,6 +76,8 @@ module Istat
     end
     
     # authenticate using the password, that was passed during initialization
+    # @note must be connected and registered to the remote machine
+    # @return [Boolean] true on success
     def authenticate!
       @logger.info "Authenticate using password #{'*' * @passwd.size}" if @logger
       send Istat::Frames::AuthenticationRequest.new(@passwd)
@@ -67,6 +86,8 @@ module Istat
     end
     
     # checks if the host has the istat service active
+    # @note must be connected to the remote machine
+    # @return true on success
     def online?
       @logger.info "Test the connection" if @logger
       send Istat::Frames::ConnectionTestRequest.new
@@ -75,13 +96,18 @@ module Istat
     end
     
     # closes the connection
+    # @return true on success
     def close!
       @logger.info "Close the connection" if @logger
       @socket.close
       true
     end
     
-    # register to the remote server using the source hostname and a uuid
+    # register to the remote server using the source hostname and a uuid. If
+    # no values are passed, they will be fetched usind system methods. (Socket.gethostname)
+    # @note must be connected before this action should be called
+    # @param [optional, String] hostname the hostname for the registration (e.g. example.com)
+    # @param [optional, String] duuid the uuid for the registration
     def register!(hostname = nil, duuid = nil)
       hostname ||= Socket.gethostname
       duuid ||= Istat::Utils.uuid
@@ -91,22 +117,35 @@ module Istat
     end
     
     # fetch data from the remote server
-    def fetch
+    # @param [Integer|Time] since size of the requested history (-1 last)
+    # @return [Istat::Frames::MeasurementResponse] the fetched result
+    # @example
+    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #   @client.start do |session|
+    #     response = session.fetch
+    #     response.load # => [0.54, 0.59, 0.65]
+    #   end
+    #
+    def fetch(since = -1)
       @logger.info("Fetch measurements with request_id #{@request_id}")
-      send Istat::Frames::MeasurementRequest.new(@request_id)
+      send Istat::Frames::MeasurementRequest.new(@request_id, since)
       @request_id += 1 # increment for next request
       Istat::Frames::MeasurementResponse.new(receive)
     end
     
   protected
     
-    # send a frame
+    # send a frame to the remote system (istatd)
+    # @note will use the *to_s* method to serialize the frame on the wire
+    # @param [Istat::Frame::Request] the frame to send
+    # @return [Integer] number of bytes send
     def send(frame)
       @logger.debug "Send: #{frame.to_s}" if @logger
       @socket.send frame.to_s, 0
     end
     
-    # receive data for a frame
+    # receive data for a frame from the remote system (istatd)
+    # @return [String] the xml stream that was send from istatd
     def receive
       data = ""
       begin

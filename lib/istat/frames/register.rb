@@ -20,28 +20,39 @@
 module Istat
   module Frames
     class RegisterRequest < Request
+      # create a new register request frame
+      # @param [String] hostname the hostname to use for registering (e.g. example.com)
+      # @param [String] duuid the duuid to use for registering (e.g. 19be1f6285ae9019254c93a880db7285)
       def initialize(hostname, duuid)
         super create([:h, hostname], [:duuid, duuid])
       end
     end
     
     class RegisterResponse < Response
+      # check if the user has to authorize using password
+      # @return [Boolean] true if the user should authorize
       def authorize?
         @root.attributes["ath"].to_i == 1
       end
       
+      # calculate the uptime value
+      # @return [Integer] a timestamp (Time.now - val)
       def uptime
         @root.attributes["n"].to_i
       end
       
+      # calculate the next_uptime value
+      # @return [Integer] a timestamp (Time.now - val)
       def next_uptime
         @root.attributes["c"].to_i
       end
       
+      # @return static value 6
       def ss
         @root.attributes["ss"].to_i
       end
       
+      # @return static value 2
       def pl
         @root.attributes["pl"].to_i
       end

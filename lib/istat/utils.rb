@@ -21,7 +21,11 @@ require "openssl"
 # THE SOFTWARE.
 module Istat
   module Utils    
-    # returns a pseudo random uuid
+    # generate a pseudo random uuid based on openssl random
+    # @return [String] the generated uuid
+    # @example
+    #   Istat::Utils.uuid # => '19be1f6285ae9019254c93a880db7285'
+    #
     def self.uuid(size = 16)
       OpenSSL::Random.random_bytes(size).unpack("C" * size).map do |char| 
         "%02x" % char

@@ -27,6 +27,7 @@ module Istat
     
     class ConnectionTestResponse < Response
       # check for an empty frame, that will be returned by the server
+      # @return [Boolean] ture if the connection was successful established
       def success?
         @root.to_a.empty?
       end

@@ -32,7 +32,10 @@ module Istat
 
       # create a new request based on the requested id. The default is to
       # request only the last values (since -1)
+      # @param [Integer] rid the request identifier (increases)
+      # @param [Integer] since the since field (-1 for last, or Time.now timestamp)
       def initialize(rid, since = -1)
+        since = Time.now.to_i - since.to_i if since.is_a? Time
         super create([RID,     rid],
                      [CPU,     since],
                      [NETWORK, since],
@@ -51,7 +54,15 @@ module Istat
         has_node? :CPU
       end
 
-      # returns the structure that is held in the 
+      # collect cpu data (can contain history)
+      # @return [Array<Hash>] the cpu load and usage data
+      # @example Result
+      #   [
+      #     { :id => 28388970, :user => 0, :system => 0, :nice => 0 },
+      #     { :id => 28388971, :user => 0, :system => 0, :nice => 0 },
+      #     { :id => 28388972, :user => 0, :system => 0, :nice => 0 },
+      #     { :id => 28388973, :user => 0, :system => 0, :nice => 0 }
+      #   ]
       def cpu
         entires_for(:CPU) do |element, attributes|
           { 
@@ -68,7 +79,18 @@ module Istat
         has_node? :NET
       end
 
-      # returns the network data
+      # collects all network information over the interfaces (can contain history)
+      # @return [Hash<Array<Hash>>] the network data for the interfaces
+      # @example Result
+      #   {
+      #     1 => [
+      #       { :id => 28388970, :d => 4177773, :u => 232278672, :t => 1304082088 },
+      #       { :id => 28388971, :d => 4177773, :u => 232278672, :t => 1304082089 },
+      #       { :id => 28388972, :d => 4177773, :u => 232278672, :t => 1304082090 },
+      #       { :id => 28388973, :d => 4177773, :u => 232278672, :t => 1304082091 }
+      #     ]
+      #   }
+      #
       def network
         interfaces = { 1 => [] }
         entires_for(:NET) do |element, attributes|
@@ -87,7 +109,21 @@ module Istat
         has_node? :MEM
       end
       
-      # returns the memory information
+      # parse the memory informations
+      # @return [Hash] the memory information
+      # @example Result
+      #   {
+      #     :wired => 25938,
+      #     :active => 27620,
+      #     :inactive => 11664,
+      #     :free => 7983,
+      #     :total => 73207,
+      #     :swap_used => 3,
+      #     :swap_total => 36861,
+      #     :page_ins => 0,
+      #     :page_outs => 0
+      #   }
+      #
       def memory
         attributes = @root.elements["MEM"].attributes
         {
@@ -108,7 +144,11 @@ module Istat
         has_node? :LOAD
       end
       
-      # returns the load of the system
+      # parse the load informations
+      # @return [Array] the load of the system
+      # @example Result
+      #   [0.54, 0.60, 0.67]
+      #
       def load
         attributes = @root.elements["LOAD"].attributes
         [attributes["one"].to_f, attributes["fv"].to_f, attributes["ff"].to_f]
@@ -119,7 +159,11 @@ module Istat
         has_node? :TEMPS
       end
       
-      # returns the temps
+      # collect all temperature informations in order
+      # @return [Array] the temps that are returned using the sensor modules
+      # @example
+      #   [30, 52, 29, 50, 30, 64, 61]
+      #
       def temps
         temps = []
         entires_for(:TEMPS) do |element, attributes|
@@ -133,7 +177,11 @@ module Istat
         has_node? :FANS
       end
       
-      # returns the fans
+      # collect all fan informations in order
+      # @return [Array] containing all the fans
+      # @example Result
+      #   [1999]
+      #
       def fans
         fans = []
         entires_for(:FANS) do |element, attributes|
@@ -147,7 +195,11 @@ module Istat
         has_node? :UPT
       end
       
-      # reuturns the uptime of the system
+      # calculate the system uptime
+      # @return [Time] the uptime orf the system
+      # @example Result
+      #   "Sat Apr 30 09:46:45 +0200 2011"
+      #
       def uptime
         Time.now - @root.elements["UPT"].attributes["u"].to_i
       end
@@ -157,7 +209,16 @@ module Istat
         has_node? :DISKS
       end
       
-      # returns all disks of the system
+      # collect all disk informations
+      # @return [Array<Hash>] all disks of the system
+      # @example Result
+      #   [
+      #     :label => "/", 
+      #     :uuid => "/dev/vzfs",
+      #     :free => 9226,
+      #     :percent_used => 39.931
+      #   ]
+      #
       def disks
         entires_for(:DISKS) do |element, attributes|
           { 
@@ -171,12 +232,14 @@ module Istat
 
     protected
 
-      # returns true is a node is available
+      # returns true if a node is available
+      # @api private
       def has_node?(name)
         !@root.elements["#{name}"].nil?
       end
 
       # yields over the elements of a path
+      # @api private
       def entires_for(name, &block)
         entries = []
         @root.elements["#{name}"].map do |element|
