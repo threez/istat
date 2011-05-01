@@ -113,5 +113,19 @@ describe "Measurement" do
         :percent_used => 39.931
       ]
     end
+    
+    it "should be possible to request all data without getting an error" do
+      @frame = Istat::Frames::MeasurementResponse.new(%Q{
+        <?xml version="1.0" encoding="UTF-8"?><isr></isr>
+      })
+      @frame.cpu.should == nil
+      @frame.network.should == nil
+      @frame.memory.should == nil
+      @frame.load.should == nil
+      @frame.uptime.should == nil
+      @frame.temps.should == nil
+      @frame.fans.should == nil
+      @frame.disks.should == nil
+    end
   end
 end

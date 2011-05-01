@@ -64,13 +64,15 @@ module Istat
       #     { :id => 28388973, :user => 0, :system => 0, :nice => 0 }
       #   ]
       def cpu
-        entires_for(:CPU) do |element, attributes|
-          { 
-            :id     => attributes["id"].to_i,
-            :user   => attributes["u"].to_i,
-            :system => attributes["s"].to_i,
-            :nice   => attributes["n"].to_i
-          }
+        if cpu?
+          entires_for(:CPU) do |element, attributes|
+            { 
+              :id     => attributes["id"].to_i,
+              :user   => attributes["u"].to_i,
+              :system => attributes["s"].to_i,
+              :nice   => attributes["n"].to_i
+            }
+          end
         end
       end
 
@@ -92,16 +94,18 @@ module Istat
       #   }
       #
       def network
-        interfaces = { 1 => [] }
-        entires_for(:NET) do |element, attributes|
-          interfaces[1] << { 
-            :id => attributes["id"].to_i,
-            :d  => attributes["d"].to_i,
-            :u  => attributes["u"].to_i,
-            :t  => attributes["t"].to_i
-          }
+        if network?
+          interfaces = { 1 => [] }
+          entires_for(:NET) do |element, attributes|
+            interfaces[1] << {
+              :id => attributes["id"].to_i,
+              :d  => attributes["d"].to_i,
+              :u  => attributes["u"].to_i,
+              :t  => attributes["t"].to_i
+            }
+          end
+          interfaces
         end
-        interfaces
       end
 
       # returns true if there is a memory section in the frame
@@ -125,18 +129,20 @@ module Istat
       #   }
       #
       def memory
-        attributes = @root.elements["MEM"].attributes
-        {
-          :wired => attributes["w"].to_i,
-          :active => attributes["a"].to_i,
-          :inactive => attributes["i"].to_i,
-          :free => attributes["f"].to_i,
-          :total => attributes["t"].to_i,
-          :swap_used => attributes["su"].to_i,
-          :swap_total => attributes["st"].to_i,
-          :page_ins => attributes["pi"].to_i,
-          :page_outs => attributes["po"].to_i
-        }
+        if memory?
+          attributes = @root.elements["MEM"].attributes
+          {
+            :wired => attributes["w"].to_i,
+            :active => attributes["a"].to_i,
+            :inactive => attributes["i"].to_i,
+            :free => attributes["f"].to_i,
+            :total => attributes["t"].to_i,
+            :swap_used => attributes["su"].to_i,
+            :swap_total => attributes["st"].to_i,
+            :page_ins => attributes["pi"].to_i,
+            :page_outs => attributes["po"].to_i
+          }
+        end
       end
 
       # returns true if there is a load section in the frame
@@ -150,8 +156,10 @@ module Istat
       #   [0.54, 0.60, 0.67]
       #
       def load
-        attributes = @root.elements["LOAD"].attributes
-        [attributes["one"].to_f, attributes["fv"].to_f, attributes["ff"].to_f]
+        if load?
+          attributes = @root.elements["LOAD"].attributes
+          [attributes["one"].to_f, attributes["fv"].to_f, attributes["ff"].to_f]
+        end
       end
 
       # returns true if there is a temps section in the frame
@@ -165,11 +173,13 @@ module Istat
       #   [30, 52, 29, 50, 30, 64, 61]
       #
       def temps
-        temps = []
-        entires_for(:TEMPS) do |element, attributes|
-          temps[attributes["i"].to_i] = attributes["t"].to_i
+        if temps?
+          temps = []
+          entires_for(:TEMPS) do |element, attributes|
+            temps[attributes["i"].to_i] = attributes["t"].to_i
+          end
+          temps
         end
-        temps
       end
 
       # returns true if there is a fan section in the frame
@@ -183,11 +193,13 @@ module Istat
       #   [1999]
       #
       def fans
-        fans = []
-        entires_for(:FANS) do |element, attributes|
-          fans[attributes["i"].to_i] = attributes["s"].to_i
+        if fans?
+          fans = []
+          entires_for(:FANS) do |element, attributes|
+            fans[attributes["i"].to_i] = attributes["s"].to_i
+          end
+          fans
         end
-        fans
       end
 
       # returns true if there is a uptime section in the frame
@@ -201,7 +213,9 @@ module Istat
       #   "Sat Apr 30 09:46:45 +0200 2011"
       #
       def uptime
-        Time.now - @root.elements["UPT"].attributes["u"].to_i
+        if uptime?
+          Time.now - @root.elements["UPT"].attributes["u"].to_i
+        end
       end
 
       # returns true if there is a disks section in the frame
@@ -220,13 +234,15 @@ module Istat
       #   ]
       #
       def disks
-        entires_for(:DISKS) do |element, attributes|
-          { 
-            :label          => attributes["n"],
-            :uuid           => attributes["uuid"],
-            :free           => attributes["f"].to_i,
-            :percent_used   => attributes["p"].to_f
-          }
+        if disks?
+          entires_for(:DISKS) do |element, attributes|
+            {
+              :label          => attributes["n"],
+              :uuid           => attributes["uuid"],
+              :free           => attributes["f"].to_i,
+              :percent_used   => attributes["p"].to_f
+            }
+          end
         end
       end
 
