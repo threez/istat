@@ -16,7 +16,8 @@ describe "Registration" do
       frame.uptime == 28406489
       frame.next_uptime.should == 28406490
       frame.authorize?.should be_true
-      frame.pl.should == 2
+      frame.platform.should == 2
+      frame.other_unix?.should be_true
     end
   end
 end

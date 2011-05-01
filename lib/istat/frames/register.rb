@@ -29,6 +29,9 @@ module Istat
     end
     
     class RegisterResponse < Response
+      MACOSX = 1
+      OTHER_UNIX = 2
+      
       # check if the user has to authorize using password
       # @return [Boolean] true if the user should authorize
       def authorize?
@@ -52,9 +55,20 @@ module Istat
         @root.attributes["ss"].to_i
       end
       
+      # parse the platform of the remote system
       # @return static value 2
-      def pl
+      def platform
         @root.attributes["pl"].to_i
+      end
+      
+      # @return [Boolean] true if the remote system is a unix (linux, freebsd, solaris)
+      def other_unix?
+        platform == OTHER_UNIX
+      end
+      
+      # @return [Boolean] true if the remote system is a mac os x
+      def macosx?
+        platform == MACOSX
       end
     end
   end
