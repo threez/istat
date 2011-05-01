@@ -49,6 +49,30 @@ module Istat
     end
     
     class MeasurementResponse < Response
+      # parse the isr header request id
+      # @return [Integer] the request id
+      def rid
+        @root.attributes["rid"].to_i
+      end
+      
+      # parse the isr header disk id
+      # @return [Integer] the disk sid
+      def sid_disk
+        @root.attributes["ds"].to_i
+      end
+      
+      # parse the isr header temp sid
+      # @return [Integer] the temp sid
+      def sid_temp
+        @root.attributes["ts"].to_i
+      end
+      
+      # parse the isr header fans sid
+      # @return [Integer] the fans sid
+      def sid_fans
+        @root.attributes["fs"].to_i
+      end
+      
       # returns true if there is a cpu section in the frame
       def cpu?
         has_node? :CPU

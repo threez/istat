@@ -46,7 +46,14 @@ describe "Measurement" do
         </isr>
       })
     end
-
+    
+    it "should be possible to parse the isr header" do
+      @frame.rid.should == 1
+      @frame.sid_disk.should == 0
+      @frame.sid_temp.should == 0
+      @frame.sid_fans.should == 0
+    end
+    
     it "should be possible to parse the cpus" do
       @frame.cpu?.should be_true
       @frame.cpu.should == [
