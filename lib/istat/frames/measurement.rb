@@ -105,15 +105,16 @@ module Istat
         has_node? :NET
       end
 
-      # collects all network information over the interfaces (can contain history)
+      # collects all network information over the interfaces (can contain history).
+      # Send and received numbers are in byztes.
       # @return [Hash<Array<Hash>>] the network data for the interfaces
       # @example Result
       #   {
       #     1 => [
-      #       { :id => 28388970, :d => 4177773, :u => 232278672, :t => 1304082088 },
-      #       { :id => 28388971, :d => 4177773, :u => 232278672, :t => 1304082089 },
-      #       { :id => 28388972, :d => 4177773, :u => 232278672, :t => 1304082090 },
-      #       { :id => 28388973, :d => 4177773, :u => 232278672, :t => 1304082091 }
+      #       { :id => 28388970, :received => 4177773, :send => 232278672, :time => <#Time ...> },
+      #       { :id => 28388971, :received => 4177773, :send => 232278672, :time => <#Time ...> },
+      #       { :id => 28388972, :received => 4177773, :send => 232278672, :time => <#Time ...> },
+      #       { :id => 28388973, :received => 4177773, :send => 232278672, :time => <#Time ...> }
       #     ]
       #   }
       #
@@ -123,9 +124,9 @@ module Istat
           entires_for(:NET) do |element, attributes|
             interfaces[1] << {
               :id => attributes["id"].to_i,
-              :d  => attributes["d"].to_i,
-              :u  => attributes["u"].to_i,
-              :t  => attributes["t"].to_i
+              :received => attributes["d"].to_i,
+              :send => attributes["u"].to_i,
+              :time  => Time.at(attributes["t"].to_f)
             }
           end
           interfaces

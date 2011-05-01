@@ -151,7 +151,7 @@ module Istat
       begin
         data << @socket.recv(1024)
       end while !data.include?("</isr>")
-      @logger.debug "Recieved: #{data}" if @logger
+      @logger.debug "Received: #{data}" if @logger
       data
     end
   end
