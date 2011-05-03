@@ -148,9 +148,7 @@ module Istat
     # @return [String] the xml stream that was send from istatd
     def receive
       data = ""
-      begin
-        data << @socket.recv(1024)
-      end while !data.include?("</isr>")
+      data << @socket.recv(1024) while !data.include?("</isr>")
       @logger.debug "Received: #{data}" if @logger
       data
     end
