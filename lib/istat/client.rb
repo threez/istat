@@ -34,7 +34,7 @@ module Istat
     # @param passwd [String] the passwd or code to access the server
     # @param logger [optional Logger] a logger that will log all actions on the client
     # @example
-    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #   @client = Istat::Client.new("example.com", 5109, "00000")
     #
     def initialize(host, port, passwd, logger = nil)
       @host, @port, @passwd, @logger = host, port, passwd, logger
@@ -44,7 +44,7 @@ module Istat
     # starts a session on the remote machine and yields it to the passed block.
     # @yield [Istat::Client] the remote session
     # @example
-    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #   @client = Istat::Client.new("example.com", 5109, "00000")
     #   @client.start do |session|
     #     # work with the session
     #   end
@@ -120,7 +120,7 @@ module Istat
     # @param [Integer|Time] since size of the requested history (-1 last)
     # @return [Istat::Frames::MeasurementResponse] the fetched result
     # @example
-    #   @client = Istat::Clinet.new("example.com", 5109, "00000")
+    #   @client = Istat::Client.new("example.com", 5109, "00000")
     #   @client.start do |session|
     #     response = session.fetch
     #     response.load # => [0.54, 0.59, 0.65]
