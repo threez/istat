@@ -40,13 +40,13 @@ module Istat
       
       # calculate the uptime value
       # @return [Integer] a timestamp (Time.now - val)
-      def uptime
+      def last_uptime
         @root.attributes["n"].to_i
       end
       
-      # calculate the next_uptime value
+      # calculate the current uptime value
       # @return [Integer] a timestamp (Time.now - val)
-      def next_uptime
+      def uptime
         @root.attributes["c"].to_i
       end
       

@@ -13,8 +13,8 @@ describe "Registration" do
       xml = %Q{<?xml version="1.0" encoding="UTF-8"?><isr pl="2" ath="1" ss="6" c="28406490" n="28406489"></isr>}
       frame = Istat::Frames::RegisterResponse.new(xml)
       frame.ss.should == 6
-      frame.uptime == 28406489
-      frame.next_uptime.should == 28406490
+      frame.last_uptime == 28406489
+      frame.uptime.should == 28406490
       frame.authorize?.should be_true
       frame.platform.should == 2
       frame.other_unix?.should be_true
