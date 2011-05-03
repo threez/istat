@@ -272,18 +272,28 @@ module Istat
       end
 
     protected
+    
+      # searches for the node with the passed name
+      # @api private
+      # @return [REXML::Element] the node or nil
+      def node(name)
+        @root.elements["#{name}"]
+      end
 
-      # returns true if a node is available
+      # checks if a node is available in the frame
+      # @return [Boolean] true is if exists in the current frame
       # @api private
       def has_node?(name)
-        !@root.elements["#{name}"].nil?
+        !node(name).nil?
       end
 
       # yields over the elements of a path
+      # @return [Array] an array of all results for the mapped elements
+      # @yield [REXML::Element, REXML::Attributes] the block values to map
       # @api private
-      def entires_for(name, &block)
+      def map(name, &block)
         entries = []
-        @root.elements["#{name}"].map do |element|
+        node(name).map do |element|
           unless element.is_a? REXML::Text
             entries << block.call(element, element.attributes)
           end
