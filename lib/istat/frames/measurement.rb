@@ -33,9 +33,8 @@ module Istat
       # create a new request based on the requested id. The default is to
       # request only the last values (since -1)
       # @param [Integer] rid the request identifier (increases)
-      # @param [Integer] since the since field (-1 for last, or Time.now timestamp)
+      # @param [Integer] since the since field (-1 for last or -2 all)
       def initialize(rid, since = -1)
-        since = Time.now.to_i - since.to_i if since.is_a? Time
         super create([RID,     rid],
                      [CPU,     since],
                      [NETWORK, since],
@@ -106,7 +105,7 @@ module Istat
       end
 
       # collects all network information over the interfaces (can contain history).
-      # Send and received numbers are in byztes.
+      # Send and received values are byte numbers.
       # @todo supports only one interface at the moment
       # @return [Hash<Array<Hash>>] the network data for the interfaces
       # @example Result

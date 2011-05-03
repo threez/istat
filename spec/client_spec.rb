@@ -47,4 +47,13 @@ describe Istat::Client do
       response.disks?.should be_true
     end
   end
+  
+  it "if ask data for two different time spans i should get different result set sizes" do
+    @client.start do |session|
+      response = session.fetch_all
+      result = response.cpu.size
+      response = session.fetch
+      response.cpu.size.should < result
+    end
+  end
 end

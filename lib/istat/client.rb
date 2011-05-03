@@ -133,6 +133,13 @@ module Istat
       Istat::Frames::MeasurementResponse.new(receive)
     end
     
+    # fetch all data available on the remote server
+    # @return [Istat::Frames::MeasurementResponse] the fetched result
+    # @see #fetch
+    def fetch_all
+      fetch(-2)
+    end
+    
   protected
     
     # send a frame to the remote system (istatd)
