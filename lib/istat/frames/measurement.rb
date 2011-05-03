@@ -89,7 +89,7 @@ module Istat
       #   ]
       def cpu
         if cpu?
-          entires_for(:CPU) do |element, attributes|
+          map(:CPU) do |element, attributes|
             { 
               :id     => attributes["id"].to_i,
               :user   => attributes["u"].to_i,
@@ -107,6 +107,7 @@ module Istat
 
       # collects all network information over the interfaces (can contain history).
       # Send and received numbers are in byztes.
+      # @todo supports only one interface at the moment
       # @return [Hash<Array<Hash>>] the network data for the interfaces
       # @example Result
       #   {
@@ -120,9 +121,10 @@ module Istat
       #
       def network
         if network?
-          interfaces = { 1 => [] }
-          entires_for(:NET) do |element, attributes|
-            interfaces[1] << {
+          interface_name = node(:NET).attributes["if"].to_i
+          interfaces = { interface_name => [] }
+          map(:NET) do |element, attributes|
+            interfaces[interface_name] << {
               :id => attributes["id"].to_i,
               :received => attributes["d"].to_i,
               :send => attributes["u"].to_i,
@@ -155,7 +157,7 @@ module Istat
       #
       def memory
         if memory?
-          attributes = @root.elements["MEM"].attributes
+          attributes = node(:MEM).attributes
           {
             :wired => attributes["w"].to_i,
             :active => attributes["a"].to_i,
@@ -182,7 +184,7 @@ module Istat
       #
       def load
         if load?
-          attributes = @root.elements["LOAD"].attributes
+          attributes = node(:LOAD).attributes
           [attributes["one"].to_f, attributes["fv"].to_f, attributes["ff"].to_f]
         end
       end
@@ -200,7 +202,7 @@ module Istat
       def temps
         if temps?
           temps = []
-          entires_for(:TEMPS) do |element, attributes|
+          map(:TEMPS) do |element, attributes|
             temps[attributes["i"].to_i] = attributes["t"].to_i
           end
           temps
@@ -220,7 +222,7 @@ module Istat
       def fans
         if fans?
           fans = []
-          entires_for(:FANS) do |element, attributes|
+          map(:FANS) do |element, attributes|
             fans[attributes["i"].to_i] = attributes["s"].to_i
           end
           fans
@@ -239,7 +241,7 @@ module Istat
       #
       def uptime
         if uptime?
-          Time.now - @root.elements["UPT"].attributes["u"].to_i
+          Time.now - node(:UPT).attributes["u"].to_i
         end
       end
 
@@ -260,7 +262,7 @@ module Istat
       #
       def disks
         if disks?
-          entires_for(:DISKS) do |element, attributes|
+          map(:DISKS) do |element, attributes|
             {
               :label          => attributes["n"],
               :uuid           => attributes["uuid"],

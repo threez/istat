@@ -1,0 +1,9 @@
+lib/istat/utils.rb 276f49011e0b6c6c55576b1af91bc88cc71e191a
+lib/istat/frames/base.rb 283c8a2af3258e3fcd6fb6a44bf4075dbf022f80
+lib/istat.rb ce2f100e7336553813bcae67a41916da91be9cae
+lib/istat/version.rb 6e450cbf001be932b269ed7d27413496a72a0f02
+lib/istat/frames/connection_test.rb 40598cbfb275fc974b39dfdd3e303e608387446e
+lib/istat/client.rb 9d7042b8067bc7972c24303b5c081989749ea191
+lib/istat/frames/register.rb 5ffe9f4a18d8dc2fbf4935457f81eed5d99e9993
+lib/istat/frames/authentication.rb 86137535877f7b04f5f612e9886bee931982908d
+lib/istat/frames/measurement.rb a8a98cd8d24aedfb67caf3f35c888e12207945d6
