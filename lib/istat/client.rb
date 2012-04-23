@@ -127,7 +127,7 @@ module Istat
     #   end
     #
     def fetch(since = -1)
-      @logger.info("Fetch measurements with request_id #{@request_id}")
+      @logger.info("Fetch measurements with request_id #{@request_id}") if @logger
       send Istat::Frames::MeasurementRequest.new(@request_id, since)
       @request_id += 1 # increment for next request
       Istat::Frames::MeasurementResponse.new(receive)
