@@ -5,7 +5,7 @@ require "istat/version"
 Gem::Specification.new do |s|
   s.name     = "istat"
   s.version  = Istat::VERSION.dup
-  s.date     = "2011-04-29"
+  s.date     = "2012-04-26"
   s.summary  = "an istat client library for ruby"
   s.email    = "vilandgr+github@googlemail.com"
   s.homepage = "https://github.com/threez/istat"
